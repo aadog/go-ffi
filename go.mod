@@ -1,4 +1,4 @@
-module github.com/aadog/ffi
+module github.com/aadog/go-ffi
 
 go 1.21.3
 
