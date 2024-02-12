@@ -81,6 +81,9 @@ func (p NativePointer) ReadUtf8String(n int) string {
 	}
 	return s[:n]
 }
+func (p NativePointer) ReadSize() uintptr {
+	return uintptr(*(*C.size_t)(p.ptr))
+}
 func (p NativePointer) ReadInt() int {
 	return int(*(*C.int)(p.ptr))
 }
@@ -143,6 +146,10 @@ func (p NativePointer) IsNull() bool {
 	return p.ToUinptr() == 0
 }
 
+func (p NativePointer) WriteSize(d uintptr) NativePointer {
+	*(*C.size_t)(p.ptr) = C.size_t(d)
+	return p
+}
 func (p NativePointer) WritePointer(d NativePointer) NativePointer {
 	*(**C.void)(p.ptr) = (*C.void)(d.ptr)
 	return p
