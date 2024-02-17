@@ -18,7 +18,7 @@ var globalPointer sync.Map
 var NULL = Ptr(0)
 
 type NativePointer struct {
-	ptr unsafe.Pointer
+	ptr uintptr
 }
 type Numeric interface {
 	int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64 | float32 | float64 | uintptr | unsafe.Pointer
@@ -28,20 +28,20 @@ func Ptr[T Numeric](v T) NativePointer {
 	vl := reflect.ValueOf(v)
 	if vl.Kind() == reflect.Uintptr {
 		return NativePointer{
-			ptr: unsafe.Pointer(vl.Interface().(uintptr)),
+			ptr: vl.Interface().(uintptr),
 		}
 	}
 	if vl.Kind() == reflect.UnsafePointer {
 		return NativePointer{
-			ptr: vl.UnsafePointer(),
+			ptr: uintptr(vl.UnsafePointer()),
 		}
 	}
 	return NativePointer{
-		ptr: unsafe.Pointer(uintptr(reflect.ValueOf(v).Int())),
+		ptr: uintptr(unsafe.Pointer(uintptr(reflect.ValueOf(v).Int()))),
 	}
 }
 func (p NativePointer) Ptr() unsafe.Pointer {
-	return p.ptr
+	return unsafe.Pointer(p.ptr)
 }
 func (p NativePointer) String() string {
 	return p.ToString()
@@ -50,17 +50,17 @@ func (p NativePointer) ToString() string {
 	return fmt.Sprintf("%p", p.ptr)
 }
 func (p NativePointer) Sub(n int) NativePointer {
-	return Ptr(unsafe.Add(p.ptr, -n))
+	return Ptr(unsafe.Add(unsafe.Pointer(p.ptr), -n))
 }
 func (p NativePointer) Add(n int) NativePointer {
-	return Ptr(unsafe.Add(p.ptr, n))
+	return Ptr(unsafe.Add(unsafe.Pointer(p.ptr), n))
 }
 func (p NativePointer) ToUinptr() uintptr {
 	return uintptr(p.ptr)
 }
 
 func (p NativePointer) ReadCString(n int) string {
-	str := C.GoString((*C.char)(p.ptr))
+	str := C.GoString((*C.char)(unsafe.Pointer(p.ptr)))
 	if len(str) == 0 {
 		return ""
 	}
@@ -71,7 +71,7 @@ func (p NativePointer) ReadCString(n int) string {
 }
 func (p NativePointer) ReadUtf8String(n int) string {
 	buf := make([]byte, n)
-	copyBytes(p.ptr, n)
+	copyBytes(unsafe.Pointer(p.ptr), n)
 	s := unsafe.String(unsafe.SliceData(buf), n)
 	if len(s) == 0 {
 		return ""
@@ -82,64 +82,64 @@ func (p NativePointer) ReadUtf8String(n int) string {
 	return s[:n]
 }
 func (p NativePointer) ReadSize() uintptr {
-	return uintptr(*(*C.size_t)(p.ptr))
+	return uintptr(*(*C.size_t)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadInt() int {
-	return int(*(*C.int)(p.ptr))
+	return int(*(*C.int)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadFloat() float32 {
-	return float32(*(*C.float)(p.ptr))
+	return float32(*(*C.float)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadDouble() float64 {
-	return float64(*(*C.double)(p.ptr))
+	return float64(*(*C.double)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadByteArray(n int) []byte {
-	return unsafe.Slice((*byte)(p.ptr), n)
+	return unsafe.Slice((*byte)(unsafe.Pointer(p.ptr)), n)
 }
 func (p NativePointer) ReadLong() int64 {
-	return int64(*(*C.long)(p.ptr))
+	return int64(*(*C.long)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadPointer() NativePointer {
-	return Ptr(unsafe.Pointer(unsafe.Pointer(*(**C.void)(p.ptr))))
+	return Ptr(unsafe.Pointer(unsafe.Pointer(*(**C.void)(unsafe.Pointer(p.ptr)))))
 }
 func (p NativePointer) ReadS8() int8 {
-	return int8(*(*C.int8_t)(p.ptr))
+	return int8(*(*C.int8_t)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadS16() int16 {
-	return int16(*(*C.int16_t)(p.ptr))
+	return int16(*(*C.int16_t)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadS32() int32 {
-	return int32(*(*C.int32_t)(p.ptr))
+	return int32(*(*C.int32_t)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadS64() int64 {
-	return int64(*(*C.int64_t)(p.ptr))
+	return int64(*(*C.int64_t)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadShort() int16 {
-	return int16(*(*C.int16_t)(p.ptr))
+	return int16(*(*C.int16_t)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadU8() uint8 {
-	return uint8(*(*C.uint8_t)(p.ptr))
+	return uint8(*(*C.uint8_t)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadU16() uint16 {
-	return uint16(*(*C.uint16_t)(p.ptr))
+	return uint16(*(*C.uint16_t)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadU32() uint32 {
-	return uint32(*(*C.uint32_t)(p.ptr))
+	return uint32(*(*C.uint32_t)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadU64() uint64 {
-	return uint64(*(*C.uint64_t)(p.ptr))
+	return uint64(*(*C.uint64_t)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadUShort() uint16 {
-	return uint16(*(*C.ushort)(p.ptr))
+	return uint16(*(*C.ushort)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadUint() uint {
-	return uint(*(*C.uint)(p.ptr))
+	return uint(*(*C.uint)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadULong() uint64 {
-	return uint64(*(*C.ulong)(p.ptr))
+	return uint64(*(*C.ulong)(unsafe.Pointer(p.ptr)))
 }
 func (p NativePointer) ReadUTF16String(n int) string {
-	bt := unsafe.Slice((*uint16)(p.ptr), n)
+	bt := unsafe.Slice((*uint16)(unsafe.Pointer(p.ptr)), n)
 	return string(utf16.Decode(bt))
 }
 func (p NativePointer) IsNull() bool {
@@ -147,75 +147,75 @@ func (p NativePointer) IsNull() bool {
 }
 
 func (p NativePointer) WriteSize(d uintptr) NativePointer {
-	*(*C.size_t)(p.ptr) = C.size_t(d)
+	*(*C.size_t)(unsafe.Pointer(p.ptr)) = C.size_t(d)
 	return p
 }
 func (p NativePointer) WritePointer(d NativePointer) NativePointer {
-	*(**C.void)(p.ptr) = (*C.void)(d.ptr)
+	*(**C.void)(unsafe.Pointer(p.ptr)) = (*C.void)(unsafe.Pointer(p.ptr))
 	return p
 }
 func (p NativePointer) WriteDouble(d float64) NativePointer {
-	*(*C.double)(p.ptr) = C.double(d)
+	*(*C.double)(unsafe.Pointer(p.ptr)) = C.double(d)
 	return p
 }
 func (p NativePointer) WriteFloat(d float32) NativePointer {
-	*(*C.float)(p.ptr) = C.float(d)
+	*(*C.float)(unsafe.Pointer(p.ptr)) = C.float(d)
 	return p
 }
 func (p NativePointer) WriteShort(d int16) NativePointer {
-	*(*C.short)(p.ptr) = C.short(d)
+	*(*C.short)(unsafe.Pointer(p.ptr)) = C.short(d)
 	return p
 }
 func (p NativePointer) WriteInt(d int) NativePointer {
-	*(*C.int)(p.ptr) = C.int(d)
+	*((*C.int)(unsafe.Pointer(p.ptr))) = C.int(d)
 	return p
 }
 func (p NativePointer) WriteLong(d int64) NativePointer {
-	*(*C.long)(p.ptr) = C.long(d)
+	*(*C.long)(unsafe.Pointer(p.ptr)) = C.long(d)
 	return p
 }
 func (p NativePointer) WriteUShort(d uint16) NativePointer {
-	*(*C.uint16_t)(p.ptr) = C.uint16_t(d)
+	*(*C.uint16_t)(unsafe.Pointer(p.ptr)) = C.uint16_t(d)
 	return p
 }
 func (p NativePointer) WriteUInt(d uint) NativePointer {
-	*(*C.int32_t)(p.ptr) = C.int32_t(d)
+	*(*C.int32_t)(unsafe.Pointer(p.ptr)) = C.int32_t(d)
 	return p
 }
 func (p NativePointer) WriteULong(d uint64) NativePointer {
-	*(*C.int64_t)(p.ptr) = C.int64_t(d)
+	*(*C.int64_t)(unsafe.Pointer(p.ptr)) = C.int64_t(d)
 	return p
 }
 func (p NativePointer) WriteS8(d int8) NativePointer {
-	*(*C.int8_t)(p.ptr) = C.int8_t(d)
+	*(*C.int8_t)(unsafe.Pointer(p.ptr)) = C.int8_t(d)
 	return p
 }
 func (p NativePointer) WriteS16(d int16) NativePointer {
-	*(*C.int16_t)(p.ptr) = C.int16_t(d)
+	*(*C.int16_t)(unsafe.Pointer(p.ptr)) = C.int16_t(d)
 	return p
 }
 func (p NativePointer) WriteS32(d int32) NativePointer {
-	*(*C.int32_t)(p.ptr) = C.int32_t(d)
+	*(*C.int32_t)(unsafe.Pointer(p.ptr)) = C.int32_t(d)
 	return p
 }
 func (p NativePointer) WriteS64(d int64) NativePointer {
-	*(*C.int64_t)(p.ptr) = C.int64_t(d)
+	*(*C.int64_t)(unsafe.Pointer(p.ptr)) = C.int64_t(d)
 	return p
 }
 func (p NativePointer) WriteU8(d uint8) NativePointer {
-	*(*C.uint8_t)(p.ptr) = C.uint8_t(d)
+	*(*C.uint8_t)(unsafe.Pointer(p.ptr)) = C.uint8_t(d)
 	return p
 }
 func (p NativePointer) WriteU16(d uint16) NativePointer {
-	*(*C.uint16_t)(p.ptr) = C.uint16_t(d)
+	*(*C.uint16_t)(unsafe.Pointer(p.ptr)) = C.uint16_t(d)
 	return p
 }
 func (p NativePointer) WriteU32(d uint32) NativePointer {
-	*(*C.uint32_t)(p.ptr) = C.uint32_t(d)
+	*(*C.uint32_t)(unsafe.Pointer(p.ptr)) = C.uint32_t(d)
 	return p
 }
 func (p NativePointer) WriteU64(d uint64) NativePointer {
-	*(*C.uint64_t)(p.ptr) = C.uint64_t(d)
+	*(*C.uint64_t)(unsafe.Pointer(p.ptr)) = C.uint64_t(d)
 	return p
 }
 func (p NativePointer) WriteByteArray(b []byte) NativePointer {

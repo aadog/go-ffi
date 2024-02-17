@@ -283,7 +283,11 @@ func WriteRetValue(retPtr NativePointer, tpName string, v any) {
 	case TUint32:
 		retPtr.WriteU32(uint32(vl.Int()))
 	case TBool:
-		retPtr.WriteS8(int8(vl.Int()))
+		if vl.Bool() == true {
+			retPtr.WriteS8(int8(1))
+		} else {
+			retPtr.WriteS8(int8(0))
+		}
 	case TPointer:
 		retPtr.WritePointer(vl.Interface().(NativePointer))
 	case TSizeT:
@@ -340,3 +344,11 @@ func MakeFFIRetValue(tpName string) unsafe.Pointer {
 	}
 	panic(errors.New("convert error"))
 }
+
+type Status int
+
+const (
+	OK         Status = Status(C.FFI_OK)
+	BadTypedef Status = Status(C.FFI_BAD_TYPEDEF)
+	BadABI     Status = Status(C.FFI_BAD_ABI)
+)
