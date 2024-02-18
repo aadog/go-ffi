@@ -291,9 +291,9 @@ func WriteRetValue(retPtr NativePointer, tpName string, v any) {
 	case TPointer:
 		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(vl.Interface().(NativePointer).ToUinptr())
 	case TSizeT:
-		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.size_t(vl.Uint()))
-	case TSSizeT:
-		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.ssize_t(vl.Int()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.size_t(vl.Int()))
+	//case TSSizeT:
+	//	*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.ssize_t(vl.Int()))
 	case TInt64:
 		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.int64_t(vl.Int()))
 	case TUint64:
