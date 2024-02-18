@@ -28,6 +28,7 @@ type CallBackStruct struct {
 
 //export NativeCallbackBinding
 func NativeCallbackBinding(cif *C.ffi_cif, retVal unsafe.Pointer, args *unsafe.Pointer, userData unsafe.Pointer) {
+
 	id := C.GoString((*C.char)(userData))
 
 	iCallBack, ok := mpCallBack.Load(id)
@@ -35,6 +36,7 @@ func NativeCallbackBinding(cif *C.ffi_cif, retVal unsafe.Pointer, args *unsafe.P
 		return
 	}
 	callbackStruct := iCallBack.(*CallBackStruct)
+
 
 	fnVal := callbackStruct.Fn
 	fnType := fnVal.Type()
@@ -104,8 +106,9 @@ func (n *NativeCallback) makeArgTypeNames() []*C.ffi_type {
 }
 
 func (n *NativeCallback) Free() {
-	//此处有内存泄露,暂时不知道怎么处理
-	//C.ffi_closure_free(unsafe.Pointer((unsafe.Pointer(n.closure))))
+	
+	C.ffi_closure_free(unsafe.Pointer((unsafe.Pointer(n.closure))))
+	fmt.Println("free")
 
 	C.free(unsafe.Pointer(n.cif.arg_types))
 	C.free(unsafe.Pointer(n.cif))

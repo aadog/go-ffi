@@ -179,11 +179,11 @@ func (p NativePointer) WriteUShort(d uint16) NativePointer {
 	return p
 }
 func (p NativePointer) WriteUInt(d uint) NativePointer {
-	*(*C.int32_t)(unsafe.Pointer(p.ptr)) = C.int32_t(d)
+	*(*C.uint32_t)(unsafe.Pointer(p.ptr)) = C.uint32_t(d)
 	return p
 }
 func (p NativePointer) WriteULong(d uint64) NativePointer {
-	*(*C.int64_t)(unsafe.Pointer(p.ptr)) = C.int64_t(d)
+	*(*C.uint64_t)(unsafe.Pointer(p.ptr)) = C.uint64_t(d)
 	return p
 }
 func (p NativePointer) WriteS8(d int8) NativePointer {

@@ -255,49 +255,49 @@ func WriteRetValue(retPtr NativePointer, tpName string, v any) {
 	vl := reflect.ValueOf(v)
 	switch tpName {
 	case Tint:
-		retPtr.WriteInt(int(vl.Int()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.int(vl.Int()))
 	case TUint:
-		retPtr.WriteUInt(uint(vl.Uint()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.uint(vl.Uint()))
 	case TLong:
-		retPtr.WriteLong(vl.Int())
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.long(vl.Int()))
 	case TULong:
-		retPtr.WriteULong(vl.Uint())
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.ulong(vl.Uint()))
 	case TChar:
-		retPtr.WriteS8(int8(vl.Int()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.int8_t(vl.Int()))
 	case TUChar:
-		retPtr.WriteU8(uint8(vl.Uint()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.uint8_t(vl.Uint()))
 	case TFloat:
-		retPtr.WriteFloat(float32(vl.Float()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.float(vl.Float()))
 	case TDouble:
-		retPtr.WriteDouble(float64(vl.Float()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.double(vl.Float()))
 	case Tint8:
-		retPtr.WriteS8(int8(vl.Int()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.int8_t(vl.Int()))
 	case TUint8:
-		retPtr.WriteU8(uint8(vl.Uint()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.uint8_t(vl.Uint()))
 	case Tint16:
-		retPtr.WriteS16(int16(vl.Int()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.int16_t(vl.Int()))
 	case TUint16:
-		retPtr.WriteU16(uint16(vl.Int()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.uint16_t(vl.Uint()))
 	case Tint32:
-		retPtr.WriteS32(int32(vl.Int()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.int32_t(vl.Int()))
 	case TUint32:
-		retPtr.WriteU32(uint32(vl.Int()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.uint32_t(vl.Int()))
 	case TBool:
 		if vl.Bool() == true {
-			retPtr.WriteS8(int8(1))
+			*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.int8_t(1))
 		} else {
-			retPtr.WriteS8(int8(0))
+			*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.int8_t(0))
 		}
 	case TPointer:
-		retPtr.WritePointer(vl.Interface().(NativePointer))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(vl.Interface().(NativePointer).ToUinptr())
 	case TSizeT:
-		retPtr.WriteU64(uint64(vl.Int()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.size_t(vl.Uint()))
 	case TSSizeT:
-		retPtr.WriteS64(int64(vl.Int()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.ssize_t(vl.Int()))
 	case TInt64:
-		retPtr.WriteS64(int64(vl.Int()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.int64_t(vl.Int()))
 	case TUint64:
-		retPtr.WriteU64(uint64(vl.Int()))
+		*((*C.ffi_arg)(retPtr.Ptr())) = C.ffi_arg(C.uint64_t(vl.Int()))
 	default:
 		panic(errors.New("convert error"))
 	}
